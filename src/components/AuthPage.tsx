@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, Shield, Globe, Bell, Loader2, ArrowLeft, Home, CheckCircle2, AlertCircle } from 'lucide-react';
+import { MessageSquare, Shield, Globe, Bell, Loader2, ArrowLeft, Home, CheckCircle2, AlertCircle, BarChart3 } from 'lucide-react';
+import signVideo from './sign.mp4';
+
+// ... (existing code)
+
+
 import { signUp, signIn } from '../utils/api';
 import { AuthHelp } from './AuthHelp';
 import { AuthStatus } from './AuthStatus';
@@ -128,16 +133,20 @@ export function AuthPage({ onLogin, onBackToHome }: AuthPageProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50 dark:bg-[#202124]">
+    <div className="min-h-screen flex flex-col lg:flex-row dark:bg-[#202124]">
       {/* Left Panel - Visuals & Branding */}
-      <div className="lg:w-1/2 relative overflow-hidden bg-[#202124] hidden lg:flex flex-col justify-between p-12 text-white">
+      <div className="lg:w-1/2 relative overflow-hidden hidden lg:flex flex-col justify-between p-12 text-white">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1532955089334-f89b48a9fed0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMG1vZGVybiUyMHRlY2hub2xvZ3klMjBmaW5hbmNlJTIwbWluaW1hbCUyMGJhY2tncm91bmR8ZW58MXx8fHwxNzY5NzcwMjIyfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-            alt="Background"
-            className="w-full h-full object-cover opacity-40"
-          />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          >
+            <source src={signVideo} type="video/mp4" />
+          </video>
           <div className="absolute inset-0 bg-gradient-to-br from-green-900/90 to-gray-900/90 mix-blend-multiply" />
         </div>
 
