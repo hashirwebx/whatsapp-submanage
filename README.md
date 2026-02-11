@@ -2,7 +2,7 @@
 
 **SubTrack Pro** is a cutting-edge, premium subscription management platform designed to help users track, manage, and optimize their digital expenses with a seamless "WhatsApp-style" experience.
 
-![Dashboard Preview](https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200)
+![Dashboard Preview](https://ik.imagekit.io/BakhshuTaekwondo/herogithub.png?updatedAt=1770782769983)
 
 ## Key Features
 
