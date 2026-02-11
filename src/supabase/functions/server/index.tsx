@@ -23,26 +23,26 @@ const generateId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 9
 const getUserFromToken = async (request: Request) => {
   const authHeader = request.headers.get('Authorization');
   console.log('Authorization header:', authHeader?.substring(0, 30) + '...');
-  
+
   const accessToken = authHeader?.split(' ')[1];
   if (!accessToken) {
     console.log('No access token found in Authorization header');
     return { user: null, error: 'No access token provided' };
   }
-  
+
   console.log('Verifying access token (first 20 chars):', accessToken.substring(0, 20) + '...');
   const { data: { user }, error } = await supabase.auth.getUser(accessToken);
-  
+
   if (error) {
     console.log('Token verification error:', error.message);
     return { user: null, error: error.message };
   }
-  
+
   if (!user) {
     console.log('No user found for token');
     return { user: null, error: 'Invalid token' };
   }
-  
+
   console.log('User authenticated successfully:', user.id);
   return { user, error: null };
 };
@@ -64,10 +64,10 @@ app.post('/make-server-333e8892/auth/init', async (c) => {
     // Check if profile already exists
     const existingProfile = await kv.get(`user:${user.id}:profile`);
     if (existingProfile) {
-      return c.json({ 
-        success: true, 
+      return c.json({
+        success: true,
         profile: existingProfile,
-        message: 'Profile already exists' 
+        message: 'Profile already exists'
       });
     }
 
@@ -92,10 +92,10 @@ app.post('/make-server-333e8892/auth/init', async (c) => {
       pendingInvitations: [],
     });
 
-    return c.json({ 
-      success: true, 
+    return c.json({
+      success: true,
       profile,
-      message: 'User data initialized successfully' 
+      message: 'User data initialized successfully'
     });
   } catch (error: any) {
     console.log('Auth init error:', error);
@@ -112,7 +112,7 @@ app.get('/make-server-333e8892/profile', async (c) => {
     }
 
     let profile = await kv.get(`user:${user.id}:profile`);
-    
+
     // If profile doesn't exist, create it from user data
     if (!profile) {
       profile = {
@@ -125,9 +125,9 @@ app.get('/make-server-333e8892/profile', async (c) => {
         language: 'en',
         timezone: 'America/New_York',
       };
-      
+
       await kv.set(`user:${user.id}:profile`, profile);
-      
+
       // Also initialize other data structures
       const existingFamily = await kv.get(`user:${user.id}:family`);
       if (!existingFamily) {
@@ -165,7 +165,7 @@ app.post('/make-server-333e8892/auth/signup', async (c) => {
       const userExists = existingUsers.users.some(u => u.email === email);
       if (userExists) {
         console.log('❌ User already exists:', email);
-        return c.json({ 
+        return c.json({
           error: 'An account with this email already exists. Please sign in instead or use the "Stuck? Get help" button if you forgot your password.',
           accountExists: true
         }, 400);
@@ -183,23 +183,23 @@ app.post('/make-server-333e8892/auth/signup', async (c) => {
 
     if (error) {
       console.log('❌ Signup error:', error);
-      
+
       // Handle specific error cases
       if (error.message.includes('already') || error.message.includes('exists') || error.message.includes('registered')) {
-        return c.json({ 
+        return c.json({
           error: 'An account with this email already exists. Please sign in instead or use the "Stuck? Get help" button if you forgot your password.',
           accountExists: true
         }, 400);
       }
-      
+
       if (error.message.includes('email') && error.message.includes('invalid')) {
         return c.json({ error: 'Please enter a valid email address.' }, 400);
       }
-      
+
       if (error.message.includes('password')) {
         return c.json({ error: 'Password must be at least 6 characters long.' }, 400);
       }
-      
+
       return c.json({ error: `Failed to create user: ${error.message}` }, 400);
     }
 
@@ -220,10 +220,10 @@ app.post('/make-server-333e8892/auth/signup', async (c) => {
 
     console.log('✅ User profile initialized in KV store');
 
-    return c.json({ 
-      success: true, 
+    return c.json({
+      success: true,
       user: data.user,
-      message: 'Account created successfully. You can now sign in.' 
+      message: 'Account created successfully. You can now sign in.'
     });
   } catch (error: any) {
     console.log('❌ Signup exception:', error);
@@ -235,35 +235,35 @@ app.post('/make-server-333e8892/auth/signup', async (c) => {
 app.post('/make-server-333e8892/auth/check-account', async (c) => {
   try {
     const { email } = await c.req.json();
-    
+
     if (!email) {
       return c.json({ error: 'Email is required' }, 400);
     }
 
     // Try to list users and check if this email exists
     const { data: existingUsers, error: listError } = await supabase.auth.admin.listUsers();
-    
+
     if (listError) {
       console.log('Error checking account:', listError);
-      return c.json({ 
-        exists: null, 
-        error: 'Unable to check account status' 
+      return c.json({
+        exists: null,
+        error: 'Unable to check account status'
       });
     }
 
     const userExists = existingUsers?.users?.some(u => u.email === email);
-    
-    return c.json({ 
+
+    return c.json({
       exists: userExists,
-      message: userExists 
-        ? 'Account exists - you should use Sign In' 
+      message: userExists
+        ? 'Account exists - you should use Sign In'
         : 'No account found - you should use Sign Up'
     });
   } catch (error: any) {
     console.log('Check account error:', error);
-    return c.json({ 
-      exists: null, 
-      error: `Failed to check account: ${error?.message || error}` 
+    return c.json({
+      exists: null,
+      error: `Failed to check account: ${error?.message || error}`
     }, 500);
   }
 });
@@ -287,8 +287,8 @@ app.post('/make-server-333e8892/auth/signin', async (c) => {
       console.log('Sign in error:', authError.message);
       // Provide more helpful error messages
       if (authError.message.includes('Invalid login credentials')) {
-        return c.json({ 
-          error: 'Invalid email or password. Please check your credentials or sign up for a new account.' 
+        return c.json({
+          error: 'Invalid email or password. Please check your credentials or sign up for a new account.'
         }, 401);
       }
       return c.json({ error: `Sign in failed: ${authError.message}` }, 401);
@@ -296,7 +296,7 @@ app.post('/make-server-333e8892/auth/signin', async (c) => {
 
     // Get the user using admin API for server-side operations
     const { data: userData, error: userError } = await supabase.auth.admin.getUserById(authData.user.id);
-    
+
     if (userError) {
       console.log('User fetch error:', userError);
       return c.json({ error: `Failed to fetch user data: ${userError.message}` }, 500);
@@ -305,7 +305,7 @@ app.post('/make-server-333e8892/auth/signin', async (c) => {
     // Get user profile from KV store
     const userProfile = await kv.get(`user:${authData.user.id}:profile`);
 
-    return c.json({ 
+    return c.json({
       success: true,
       session: authData.session,
       user: userData.user,
@@ -387,11 +387,11 @@ app.post('/make-server-333e8892/subscriptions', async (c) => {
         const reminderSettings = subscriptionData.reminderSettings;
         const daysBeforePayment = reminderSettings.daysBeforePayment || 3;
         const reminderTime = reminderSettings.reminderTime || '09:00';
-        
+
         const nextBillingDate = new Date(subscriptionData.nextBilling);
         const reminderDate = new Date(nextBillingDate);
         reminderDate.setDate(reminderDate.getDate() - daysBeforePayment);
-        
+
         const reminders = await kv.get(`user:${user.id}:reminders`) || [];
         const newReminder = {
           id: generateId(),
@@ -407,19 +407,19 @@ app.post('/make-server-333e8892/subscriptions', async (c) => {
           status: 'scheduled',
           createdAt: new Date().toISOString(),
         };
-        
+
         reminders.push(newReminder);
         await kv.set(`user:${user.id}:reminders`, reminders);
-        
+
         console.log('✅ Reminder scheduled for subscription:', subscriptionData.name);
       } catch (reminderError) {
         console.log('⚠️ Failed to schedule reminder:', reminderError);
       }
     }
 
-    return c.json({ 
+    return c.json({
       success: true,
-      subscription: data 
+      subscription: data
     });
   } catch (error: any) {
     console.log('Add subscription error:', error);
@@ -437,7 +437,7 @@ app.put('/make-server-333e8892/subscriptions/:id', async (c) => {
 
     const subId = c.req.param('id');
     const updates = await c.req.json();
-    
+
     const { data, error: dbError } = await supabase
       .from('subscriptions')
       .update({
@@ -454,9 +454,9 @@ app.put('/make-server-333e8892/subscriptions/:id', async (c) => {
       return c.json({ error: `Failed to update subscription: ${dbError.message}` }, 500);
     }
 
-    return c.json({ 
+    return c.json({
       success: true,
-      subscription: data 
+      subscription: data
     });
   } catch (error: any) {
     console.log('Update subscription error:', error);
@@ -513,21 +513,21 @@ app.get('/make-server-333e8892/analytics', async (c) => {
       console.log('Get analytics DB error:', dbError);
       return c.json({ error: `Failed to fetch analytics: ${dbError.message}` }, 500);
     }
-    
+
     // Calculate analytics
     let totalMonthly = 0;
     const categoryBreakdown: Record<string, number> = {};
     const activeSubscriptions = subscriptions.filter(s => s.status === 'active');
-    
+
     activeSubscriptions.forEach(sub => {
-      const monthlyAmount = sub.billingCycle === 'yearly' 
-        ? sub.amount / 12 
+      const monthlyAmount = sub.billingCycle === 'yearly'
+        ? sub.amount / 12
         : sub.billingCycle === 'weekly'
-        ? sub.amount * 4.33
-        : sub.amount;
-      
+          ? sub.amount * 4.33
+          : sub.amount;
+
       totalMonthly += monthlyAmount;
-      
+
       if (!categoryBreakdown[sub.category]) {
         categoryBreakdown[sub.category] = 0;
       }
@@ -575,7 +575,7 @@ app.get('/make-server-333e8892/family', async (c) => {
 
     // Get pending invitations
     const invitationKeys = await kv.getByPrefix(`invitation:${user.id}:`) || [];
-    const pendingInvitations = invitationKeys.filter(inv => 
+    const pendingInvitations = invitationKeys.filter(inv =>
       inv && inv.status === 'pending' && inv.expiresAt && new Date(inv.expiresAt) > new Date()
     );
 
@@ -597,7 +597,7 @@ app.post('/make-server-333e8892/family/invite', async (c) => {
     }
 
     const { email, role } = await c.req.json();
-    
+
     if (!email || !role) {
       return c.json({ error: 'Email and role are required' }, 400);
     }
@@ -617,9 +617,9 @@ app.post('/make-server-333e8892/family/invite', async (c) => {
 
     // Check for existing pending invitation
     const existingInvitations = await kv.getByPrefix(`invitation:${user.id}:`) || [];
-    const pendingInvitation = existingInvitations.find(inv => 
-      inv && inv.email === email && 
-      inv.status === 'pending' && 
+    const pendingInvitation = existingInvitations.find(inv =>
+      inv && inv.email === email &&
+      inv.status === 'pending' &&
       inv.expiresAt && new Date(inv.expiresAt) > new Date()
     );
 
@@ -663,11 +663,11 @@ app.post('/make-server-333e8892/family/invite', async (c) => {
     console.log(`Expires: ${expiresAt.toISOString()}`);
     console.log('========================');
 
-    return c.json({ 
+    return c.json({
       success: true,
       invitation,
       invitationLink, // Include link in response for testing
-      message: 'Invitation sent successfully' 
+      message: 'Invitation sent successfully'
     });
   } catch (error: any) {
     console.log('Invite family member error:', error);
@@ -684,9 +684,9 @@ app.get('/make-server-333e8892/family/invitations', async (c) => {
     }
 
     const invitations = await kv.getByPrefix(`invitation:${user.id}:`) || [];
-    
+
     // Filter out expired invitations
-    const activeInvitations = invitations.filter(inv => 
+    const activeInvitations = invitations.filter(inv =>
       inv && inv.status === 'pending' && inv.expiresAt && new Date(inv.expiresAt) > new Date()
     );
 
@@ -736,11 +736,11 @@ app.post('/make-server-333e8892/family/invitations/:id/resend', async (c) => {
     console.log(`Link: ${invitationLink}`);
     console.log('=========================');
 
-    return c.json({ 
+    return c.json({
       success: true,
       invitation: updatedInvitation,
       invitationLink,
-      message: 'Invitation resent successfully' 
+      message: 'Invitation resent successfully'
     });
   } catch (error: any) {
     console.log('Resend invitation error:', error);
@@ -767,9 +767,9 @@ app.delete('/make-server-333e8892/family/invitations/:id', async (c) => {
     await kv.del(`invitation:${user.id}:${invitationId}`);
     await kv.del(`invitation:token:${invitation.token}`);
 
-    return c.json({ 
+    return c.json({
       success: true,
-      message: 'Invitation cancelled successfully' 
+      message: 'Invitation cancelled successfully'
     });
   } catch (error: any) {
     console.log('Cancel invitation error:', error);
@@ -803,13 +803,76 @@ app.post('/make-server-333e8892/family/invitations/accept/:token', async (c) => 
       sharedSubscriptions: [],
     };
 
-    // Check if user already exists (this would require user to be logged in)
-    // For now, we'll just return the invitation details and let the frontend handle registration
-    
-    return c.json({ 
+    // Check if user is logged in
+    const { user, error: authError } = await getUserFromToken(c.req.raw);
+
+    if (user) {
+      console.log('Accepting invitation for authenticated user:', user.id);
+
+      // Check if user is already in this family
+      const isAlreadyMember = familyGroup.members.some(m => m.id === user.id || m.email === user.email);
+      if (isAlreadyMember) {
+        return c.json({ error: 'You are already a member of this family group' }, 400);
+      }
+
+      // Get user profile for member name
+      const userProfile = await kv.get(`user:${user.id}:profile`) || {};
+
+      // Add user to family group members
+      const newMember = {
+        id: user.id,
+        name: userProfile.name || user.user_metadata?.name || user.email?.split('@')[0] || 'New Member',
+        email: user.email,
+        role: invitation.role,
+        avatar: '👤',
+        joinedDate: new Date().toISOString(),
+        sharedSubscriptions: 0,
+      };
+
+      familyGroup.members.push(newMember);
+
+      // Update invitation status
+      const updatedInvitation = {
+        ...invitation,
+        status: 'accepted',
+        acceptedAt: new Date().toISOString(),
+        acceptedBy: user.id,
+      };
+
+      // Save everything
+      await kv.set(`user:${invitation.invitedBy}:family`, familyGroup);
+      await kv.set(`invitation:${invitation.invitedBy}:${invitation.id}`, updatedInvitation);
+      await kv.set(`invitation:token:${token}`, updatedInvitation);
+
+      // Also initialize a profile for this user if it doesn't exist
+      if (!userProfile.id) {
+        await kv.set(`user:${user.id}:profile`, {
+          id: user.id,
+          email: user.email,
+          name: newMember.name,
+          createdAt: new Date().toISOString(),
+          currency: 'USD',
+          language: 'en',
+          timezone: 'America/New_York',
+        });
+      }
+
+      return c.json({
+        success: true,
+        invitation: updatedInvitation,
+        user: {
+          ...user,
+          profile: userProfile.id ? userProfile : null
+        },
+        message: 'Successfully joined the family group!'
+      });
+    }
+
+    // If not logged in, just return details for frontend display
+    return c.json({
       success: true,
       invitation,
-      message: 'Invitation is valid. Please sign up or log in to accept.' 
+      message: 'Invitation is valid. Please sign up or log in to accept.'
     });
   } catch (error: any) {
     console.log('Accept invitation error:', error);
@@ -841,9 +904,9 @@ app.post('/make-server-333e8892/family/members', async (c) => {
     familyGroup.members.push(newMember);
     await kv.set(`user:${user.id}:family`, familyGroup);
 
-    return c.json({ 
+    return c.json({
       success: true,
-      member: newMember 
+      member: newMember
     });
   } catch (error) {
     console.log('Add family member error:', error);
@@ -867,7 +930,7 @@ app.delete('/make-server-333e8892/family/members/:id', async (c) => {
 
     // Remove member from members list
     familyGroup.members = familyGroup.members.filter(m => m.id !== memberId);
-    
+
     // Remove member from shared subscriptions
     familyGroup.sharedSubscriptions = familyGroup.sharedSubscriptions.map(sub => ({
       ...sub,
@@ -893,7 +956,7 @@ app.put('/make-server-333e8892/family/members/:id/role', async (c) => {
 
     const memberId = c.req.param('id');
     const { role } = await c.req.json();
-    
+
     const familyGroup = await kv.get(`user:${user.id}:family`) || {
       members: [],
       sharedSubscriptions: [],
@@ -907,9 +970,9 @@ app.put('/make-server-333e8892/family/members/:id/role', async (c) => {
     familyGroup.members[memberIndex].role = role;
     await kv.set(`user:${user.id}:family`, familyGroup);
 
-    return c.json({ 
+    return c.json({
       success: true,
-      member: familyGroup.members[memberIndex] 
+      member: familyGroup.members[memberIndex]
     });
   } catch (error) {
     console.log('Update member role error:', error);
@@ -926,11 +989,11 @@ app.post('/make-server-333e8892/family/share', async (c) => {
     }
 
     const { subscriptionId, memberIds } = await c.req.json();
-    
+
     // Get user's subscriptions
     const subscriptions = await kv.get(`user:${user.id}:subscriptions`) || [];
     const subscription = subscriptions.find(s => s.id === subscriptionId);
-    
+
     if (!subscription) {
       return c.json({ error: 'Subscription not found' }, 404);
     }
@@ -943,7 +1006,7 @@ app.post('/make-server-333e8892/family/share', async (c) => {
 
     // Create or update shared subscription
     const existingIndex = familyGroup.sharedSubscriptions.findIndex(s => s.id === subscriptionId);
-    
+
     const sharedSub = {
       id: subscriptionId,
       name: subscription.name,
@@ -964,7 +1027,7 @@ app.post('/make-server-333e8892/family/share', async (c) => {
 
     // Update shared subscription count for members
     familyGroup.members = familyGroup.members.map(member => {
-      const count = familyGroup.sharedSubscriptions.filter(sub => 
+      const count = familyGroup.sharedSubscriptions.filter(sub =>
         sub.sharedWith.includes(member.id)
       ).length;
       return { ...member, sharedSubscriptions: count };
@@ -972,9 +1035,9 @@ app.post('/make-server-333e8892/family/share', async (c) => {
 
     await kv.set(`user:${user.id}:family`, familyGroup);
 
-    return c.json({ 
+    return c.json({
       success: true,
-      sharedSubscription: sharedSub 
+      sharedSubscription: sharedSub
     });
   } catch (error) {
     console.log('Share subscription error:', error);
@@ -991,7 +1054,7 @@ app.post('/make-server-333e8892/family/unshare', async (c) => {
     }
 
     const { subscriptionId, memberId } = await c.req.json();
-    
+
     const familyGroup = await kv.get(`user:${user.id}:family`) || {
       members: [],
       sharedSubscriptions: [],
@@ -1003,7 +1066,7 @@ app.post('/make-server-333e8892/family/unshare', async (c) => {
     }
 
     // Remove member from sharedWith
-    familyGroup.sharedSubscriptions[subIndex].sharedWith = 
+    familyGroup.sharedSubscriptions[subIndex].sharedWith =
       familyGroup.sharedSubscriptions[subIndex].sharedWith.filter(id => id !== memberId);
 
     // If no more members, remove the shared subscription entirely
@@ -1013,7 +1076,7 @@ app.post('/make-server-333e8892/family/unshare', async (c) => {
 
     // Update shared subscription count for members
     familyGroup.members = familyGroup.members.map(member => {
-      const count = familyGroup.sharedSubscriptions.filter(sub => 
+      const count = familyGroup.sharedSubscriptions.filter(sub =>
         sub.sharedWith.includes(member.id)
       ).length;
       return { ...member, sharedSubscriptions: count };
@@ -1042,7 +1105,7 @@ app.get('/make-server-333e8892/notifications', async (c) => {
 
     // Get notifications from KV store
     const notifications = await kv.get(`user:${user.id}:notifications`) || [];
-    
+
     // Sort by created_at descending (newest first)
     notifications.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
@@ -1063,7 +1126,7 @@ app.post('/make-server-333e8892/notifications/:id/read', async (c) => {
 
     const notificationId = c.req.param('id');
     const notifications = await kv.get(`user:${user.id}:notifications`) || [];
-    
+
     const updatedNotifications = notifications.map(n =>
       n.id === notificationId ? { ...n, read_at: new Date().toISOString() } : n
     );
@@ -1086,7 +1149,7 @@ app.post('/make-server-333e8892/notifications/mark-all-read', async (c) => {
     }
 
     const notifications = await kv.get(`user:${user.id}:notifications`) || [];
-    
+
     const updatedNotifications = notifications.map(n => ({
       ...n,
       read_at: n.read_at || new Date().toISOString()
@@ -1111,7 +1174,7 @@ app.delete('/make-server-333e8892/notifications/:id', async (c) => {
 
     const notificationId = c.req.param('id');
     const notifications = await kv.get(`user:${user.id}:notifications`) || [];
-    
+
     const filteredNotifications = notifications.filter(n => n.id !== notificationId);
 
     await kv.set(`user:${user.id}:notifications`, filteredNotifications);
@@ -1135,7 +1198,7 @@ app.post('/make-server-333e8892/notifications', async (c) => {
     const { subscription_id, type, title, message, status, metadata } = body;
 
     const notifications = await kv.get(`user:${user.id}:notifications`) || [];
-    
+
     const newNotification = {
       id: crypto.randomUUID(),
       user_id: user.id,
@@ -1178,7 +1241,7 @@ app.get('/make-server-333e8892/reminders', async (c) => {
     }
 
     const reminders = await kv.get(`user:${user.id}:reminders`) || [];
-    
+
     // Filter out past reminders and sort by reminder date
     const now = new Date();
     const upcomingReminders = reminders.filter(r => {
@@ -1186,9 +1249,9 @@ app.get('/make-server-333e8892/reminders', async (c) => {
       return reminderDate >= now || r.status === 'scheduled';
     }).sort((a, b) => new Date(a.reminderDate).getTime() - new Date(b.reminderDate).getTime());
 
-    return c.json({ 
+    return c.json({
       reminders: upcomingReminders,
-      total: upcomingReminders.length 
+      total: upcomingReminders.length
     });
   } catch (error) {
     console.log('Get reminders error:', error);
@@ -1206,10 +1269,10 @@ app.put('/make-server-333e8892/reminders/:id', async (c) => {
 
     const reminderId = c.req.param('id');
     const updates = await c.req.json();
-    
+
     const reminders = await kv.get(`user:${user.id}:reminders`) || [];
     const index = reminders.findIndex(r => r.id === reminderId);
-    
+
     if (index === -1) {
       return c.json({ error: 'Reminder not found' }, 404);
     }
@@ -1222,9 +1285,9 @@ app.put('/make-server-333e8892/reminders/:id', async (c) => {
 
     await kv.set(`user:${user.id}:reminders`, reminders);
 
-    return c.json({ 
+    return c.json({
       success: true,
-      reminder: reminders[index] 
+      reminder: reminders[index]
     });
   } catch (error) {
     console.log('Update reminder error:', error);
@@ -1242,9 +1305,9 @@ app.delete('/make-server-333e8892/reminders/:id', async (c) => {
 
     const reminderId = c.req.param('id');
     const reminders = await kv.get(`user:${user.id}:reminders`) || [];
-    
+
     const filtered = reminders.filter(r => r.id !== reminderId);
-    
+
     if (filtered.length === reminders.length) {
       return c.json({ error: 'Reminder not found' }, 404);
     }
@@ -1271,7 +1334,7 @@ const generateVerificationCode = () => {
 const sendWhatsAppMessage = async (phoneNumber: string, message: string) => {
   const whatsappToken = Deno.env.get('WHATSAPP_API_TOKEN');
   const whatsappPhoneId = Deno.env.get('WHATSAPP_PHONE_NUMBER_ID');
-  
+
   if (!whatsappToken || !whatsappPhoneId) {
     console.log('⚠️ WhatsApp API credentials not configured. Message would be sent to:', phoneNumber);
     console.log('Message:', message);
@@ -1287,7 +1350,7 @@ const sendWhatsAppMessage = async (phoneNumber: string, message: string) => {
   try {
     // WhatsApp Business API endpoint
     const apiUrl = `https://graph.facebook.com/v18.0/${whatsappPhoneId}/messages`;
-    
+
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
@@ -1330,11 +1393,11 @@ app.get('/make-server-333e8892/whatsapp/status', async (c) => {
     }
 
     const connection = await kv.get(`user:${user.id}:whatsapp:connection`);
-    
+
     if (!connection) {
-      return c.json({ 
+      return c.json({
         connected: false,
-        verified: false 
+        verified: false
       });
     }
 
@@ -1389,9 +1452,9 @@ app.post('/make-server-333e8892/whatsapp/verify/send', async (c) => {
     // Send verification code via WhatsApp
     try {
       const message = `Your SubTrack Pro verification code is: ${code}\n\nThis code will expire in 10 minutes.\n\nIf you didn't request this code, please ignore this message.`;
-      
+
       await sendWhatsAppMessage(phoneNumber, message);
-      
+
       console.log('✅ Verification code sent to:', phoneNumber);
       console.log('Verification ID:', verificationId);
       console.log('Code:', code); // In production, don't log this!
@@ -1455,9 +1518,9 @@ app.post('/make-server-333e8892/whatsapp/verify/confirm', async (c) => {
       // Increment attempts
       verification.attempts += 1;
       await kv.set(`verification:${verificationId}`, verification);
-      
-      return c.json({ 
-        error: `Invalid verification code. ${5 - verification.attempts} attempts remaining.` 
+
+      return c.json({
+        error: `Invalid verification code. ${5 - verification.attempts} attempts remaining.`
       }, 400);
     }
 
@@ -1564,8 +1627,8 @@ app.post('/make-server-333e8892/whatsapp/test', async (c) => {
       });
     } catch (sendError: any) {
       console.error('Failed to send test message:', sendError);
-      return c.json({ 
-        error: `Failed to send message: ${sendError.message}` 
+      return c.json({
+        error: `Failed to send message: ${sendError.message}`
       }, 500);
     }
   } catch (error: any) {
@@ -1617,8 +1680,8 @@ app.post('/make-server-333e8892/whatsapp/send', async (c) => {
       });
     } catch (sendError: any) {
       console.error('Failed to send WhatsApp message:', sendError);
-      return c.json({ 
-        error: `Failed to send message: ${sendError.message}` 
+      return c.json({
+        error: `Failed to send message: ${sendError.message}`
       }, 500);
     }
   } catch (error: any) {
@@ -1721,7 +1784,7 @@ app.put('/make-server-333e8892/settings', async (c) => {
 
     const updates = await c.req.json();
     const currentSettings = await kv.get(`user:${user.id}:settings`) || {};
-    
+
     const newSettings = {
       ...currentSettings,
       ...updates,
@@ -1730,9 +1793,9 @@ app.put('/make-server-333e8892/settings', async (c) => {
 
     await kv.set(`user:${user.id}:settings`, newSettings);
 
-    return c.json({ 
+    return c.json({
       success: true,
-      settings: newSettings 
+      settings: newSettings
     });
   } catch (error) {
     console.log('Update settings error:', error);
@@ -1753,7 +1816,7 @@ app.post('/make-server-333e8892/auth/change-password', async (c) => {
     }
 
     const { currentPassword, newPassword } = await c.req.json();
-    
+
     if (!currentPassword || !newPassword) {
       return c.json({ error: 'Current and new password are required' }, 400);
     }
@@ -1769,9 +1832,9 @@ app.post('/make-server-333e8892/auth/change-password', async (c) => {
       return c.json({ error: `Failed to change password: ${updateError.message}` }, 400);
     }
 
-    return c.json({ 
+    return c.json({
       success: true,
-      message: 'Password changed successfully' 
+      message: 'Password changed successfully'
     });
   } catch (error) {
     console.log('Change password error:', error);
@@ -1805,10 +1868,10 @@ app.get('/make-server-333e8892/user/export', async (c) => {
       familyGroup,
     };
 
-    return c.json({ 
+    return c.json({
       success: true,
       data: exportData,
-      message: 'User data exported successfully' 
+      message: 'User data exported successfully'
     });
   } catch (error) {
     console.log('Export user data error:', error);
@@ -1825,7 +1888,7 @@ app.delete('/make-server-333e8892/user/delete', async (c) => {
     }
 
     const { password } = await c.req.json();
-    
+
     if (!password) {
       return c.json({ error: 'Password is required to delete account' }, 400);
     }
@@ -1838,15 +1901,15 @@ app.delete('/make-server-333e8892/user/delete', async (c) => {
 
     // Delete user from Supabase Auth
     const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id);
-    
+
     if (deleteError) {
       console.log('Delete user error:', deleteError);
       return c.json({ error: `Failed to delete account: ${deleteError.message}` }, 400);
     }
 
-    return c.json({ 
+    return c.json({
       success: true,
-      message: 'Account deleted successfully' 
+      message: 'Account deleted successfully'
     });
   } catch (error) {
     console.log('Delete account error:', error);
@@ -1856,10 +1919,10 @@ app.delete('/make-server-333e8892/user/delete', async (c) => {
 
 // Health check
 app.get('/make-server-333e8892/health', (c) => {
-  return c.json({ 
-    status: 'healthy', 
+  return c.json({
+    status: 'healthy',
     timestamp: new Date().toISOString(),
-    service: 'SubTrack Pro API' 
+    service: 'SubTrack Pro API'
   });
 });
 

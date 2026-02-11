@@ -248,8 +248,35 @@ export function FamilyProvider({ children, user, onUserUpdate }: FamilyProviderP
 
       setMembers(membersData);
       setSharedSubscriptions(groupResponse.familyGroup?.sharedSubscriptions || []);
-      setPendingInvitations(groupResponse.familyGroup?.pendingInvitations || []);
-      setReceivedInvitations(invitationsResponse.invitations || []);
+
+      const allInvitations = invitationsResponse.invitations || [];
+      const currentUserId = user.id;
+      const currentUserEmail = user.email?.toLowerCase().trim();
+
+      console.log('FamilyContext: Filtering invitations for:', currentUserEmail);
+
+      // 1. Invitations SENT BY the current user
+      const sent = allInvitations.filter((inv: any) => {
+        const inviterId = inv.invitedBy || inv.invited_by;
+        return inviterId === currentUserId;
+      });
+      setPendingInvitations(sent);
+
+      // 2. Invitations RECEIVED BY the current user (show on Dashboard)
+      const received = allInvitations.filter((inv: any) => {
+        const targetEmail = inv.email?.toLowerCase().trim();
+        const inviterId = inv.invitedBy || inv.invited_by;
+
+        // Match if: target email is mine AND I didn't send it myself
+        const isForMe = targetEmail === currentUserEmail;
+        const isNotByMe = inviterId !== currentUserId;
+        const isPending = inv.status === 'pending';
+
+        return isForMe && isNotByMe && isPending;
+      });
+
+      console.log(`FamilyContext: Processed ${allInvitations.length} total. Sent: ${sent.length}, Received: ${received.length}`);
+      setReceivedInvitations(received);
     } catch (error: any) {
       console.error('FamilyContext: Failed to load data:', error);
       setError(error.message || 'Failed to load data');

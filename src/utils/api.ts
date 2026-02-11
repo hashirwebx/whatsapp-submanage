@@ -300,13 +300,21 @@ export async function cancelInvitation(accessToken: string, invitationId: string
   });
 }
 
+export async function getInvitationDetails(token: string) {
+  // The backend uses a POST route for validation even if just fetching details
+  return apiCall(`/family/invitations/accept/${token}`, {
+    method: 'POST',
+  });
+}
+
 export async function acceptInvitation(token: string, accessToken?: string) {
+  const path = `/family/invitations/accept/${token}`;
   if (accessToken) {
-    return authenticatedApiCall(`/family/invitations/accept/${token}`, accessToken, {
+    return authenticatedApiCall(path, accessToken, {
       method: 'POST',
     });
   }
-  return apiCall(`/family/invitations/accept/${token}`, {
+  return apiCall(path, {
     method: 'POST',
   });
 }

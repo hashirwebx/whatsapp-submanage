@@ -3,7 +3,7 @@ import { UserPlus, Loader2, CheckCircle2, XCircle, Mail } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { acceptInvitation } from '../utils/api';
+import { getInvitationDetails, acceptInvitation } from '../utils/api';
 import { toast } from 'sonner@2.0.3';
 
 interface AcceptInviteProps {
@@ -18,6 +18,7 @@ export function AcceptInvite({ token, user, onAccept, onBack }: AcceptInviteProp
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAccepting, setIsAccepting] = useState(false);
+  const [isAccepted, setIsAccepted] = useState(false);
 
   useEffect(() => {
     loadInvitation();
@@ -28,8 +29,13 @@ export function AcceptInvite({ token, user, onAccept, onBack }: AcceptInviteProp
     setError(null);
 
     try {
-      const response = await acceptInvitation(token);
+      const response = await getInvitationDetails(token);
       setInvitation(response.invitation);
+
+      // If invitation is already accepted, show success state
+      if (response.invitation.status === 'accepted') {
+        setIsAccepted(true);
+      }
     } catch (error: any) {
       console.error('Failed to load invitation:', error);
       setError(error.message || 'Invalid or expired invitation');
@@ -46,11 +52,12 @@ export function AcceptInvite({ token, user, onAccept, onBack }: AcceptInviteProp
 
       const response = await acceptInvitation(token, user?.accessToken);
 
-      if (response.success) {
+      if (response.success && response.user) {
         toast.success(`Welcome! You have successfully joined ${invitation.invitedByName}'s family group.`);
-        onAccept(invitation);
+        setIsAccepted(true);
+        setTimeout(() => onAccept(invitation), 2000);
       } else {
-        throw new Error(response.message || 'Failed to accept invitation');
+        throw new Error(response.message || 'Please log in to accept this invitation.');
       }
     } catch (error: any) {
       console.error('Accept error:', error);
@@ -195,28 +202,52 @@ export function AcceptInvite({ token, user, onAccept, onBack }: AcceptInviteProp
 
           {/* Actions */}
           <div className="space-y-3">
-            <Button
-              onClick={handleAccept}
-              disabled={isAccepting}
-              className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
-              size="lg"
-            >
-              {isAccepting ? (
-                <>
-                  <Loader2 size={20} className="mr-2 animate-spin" />
-                  Accepting...
-                </>
-              ) : (
-                <>
-                  <CheckCircle2 size={20} className="mr-2" />
-                  Accept Invitation
-                </>
-              )}
-            </Button>
-
-            <Button onClick={onBack} variant="outline" className="w-full">
-              Maybe Later
-            </Button>
+            {isAccepted ? (
+              <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg text-center border border-green-200 dark:border-green-800">
+                <CheckCircle2 size={40} className="text-green-600 dark:text-green-400 mx-auto mb-2" />
+                <h4 className="font-semibold text-green-900 dark:text-green-300">Invitation Accepted!</h4>
+                <p className="text-sm text-green-800 dark:text-green-400 mt-1">Redirecting to your dashboard...</p>
+              </div>
+            ) : !user ? (
+              <div className="space-y-4">
+                <div className="bg-yellow-50 dark:bg-yellow-900/10 p-4 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                  <p className="text-sm text-yellow-800 dark:text-yellow-400 font-medium">
+                    You need to be logged in to accept this invitation.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => window.location.href = '/'}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  size="lg"
+                >
+                  Log In to Accept
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button
+                  onClick={handleAccept}
+                  disabled={isAccepting}
+                  className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600"
+                  size="lg"
+                >
+                  {isAccepting ? (
+                    <>
+                      <Loader2 size={20} className="mr-2 animate-spin" />
+                      Accepting...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 size={20} className="mr-2" />
+                      Accept Invitation
+                    </>
+                  )}
+                </Button>
+                <Button onClick={onBack} variant="outline" className="w-full">
+                  Maybe Later
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Footer Info */}

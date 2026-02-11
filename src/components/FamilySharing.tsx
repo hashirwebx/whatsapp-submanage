@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Users, Plus, Crown, Shield, Eye, Mail, MoreVertical, UserPlus, Check, X, Loader2, RefreshCw, Trash2 } from 'lucide-react';
+import { toast } from 'sonner@2.0.3';
+import { LayoutDashboard, Users, UserPlus, Shield, Crown, Check, X, Mail, Trash2, MoreVertical, RefreshCw, Link as LinkIcon, Copy, ExternalLink, Loader2, Eye } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
@@ -349,6 +350,19 @@ export function FamilySharing({ user }: FamilySharingProps) {
                         </div>
                       </div>
                       <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            const inviteLink = `${window.location.origin}/?invite_token=${invitation.token}`;
+                            navigator.clipboard.writeText(inviteLink);
+                            toast.success('Invitation link copied to clipboard!');
+                          }}
+                          className="flex items-center gap-1"
+                        >
+                          <Copy size={14} />
+                          Copy Link
+                        </Button>
                         <Button
                           size="sm"
                           variant="outline"
