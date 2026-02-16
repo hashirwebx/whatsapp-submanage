@@ -39,7 +39,7 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-  
+
   /* Custom brand color - replaces green */
   --brand-primary: #225E56;
   --brand-50: #e8f2f0;
@@ -55,14 +55,14 @@
 }
 
 .dark {
-  --background: #202124;
+  --background: #000000;
   --foreground: #F8F9FA;
-  --card: #202124;
+  --card: #000000;
   --card-foreground: #F8F9FA;
-  --popover: #202124;
+  --popover: #000000;
   --popover-foreground: #F8F9FA;
   --primary: #F8F9FA;
-  --primary-foreground: #202124;
+  --primary-foreground: #000000;
   --secondary: #303134;
   --secondary-foreground: #F8F9FA;
   --muted: #303134;
@@ -132,7 +132,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  
+
   /* Brand colors - Override green with custom color #225E56 */
   --color-green-50: var(--brand-50);
   --color-green-100: var(--brand-100);

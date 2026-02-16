@@ -135,7 +135,7 @@ function AppContent() {
   // Show loading screen while checking authentication
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 dark:from-[#202124] dark:to-[#303134]">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50 dark:from-black dark:to-[#303134]">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-green-600 dark:border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-[#F8F9FA]">Loading SubTrack Pro...</p>
@@ -259,7 +259,7 @@ function AppContent() {
               accessToken={user?.accessToken || ''}
               userId={user?.id || ''}
             />
-            <ThemeToggle />
+            {/* <ThemeToggle /> */}
           </div>
           <button
             onClick={handleLogout}
@@ -335,7 +335,7 @@ function AppContent() {
                   accessToken={user?.accessToken || ''}
                   userId={user?.id || ''}
                 />
-                <ThemeToggle />
+                {/* <ThemeToggle /> */}
               </div>
               <button
                 onClick={handleLogout}
@@ -352,7 +352,7 @@ function AppContent() {
       {/* Main Content */}
       <main className="flex-1 overflow-auto flex flex-col">
         {/* Mobile Header */}
-        <div className="lg:hidden sticky top-0 z-10 bg-white dark:bg-[#202124] border-b border-gray-200 dark:border-[#3C4043] px-4 py-3 flex items-center justify-between">
+        <div className="lg:hidden sticky top-0 z-10 bg-white dark:bg-black border-b border-gray-200 dark:border-[#3C4043] px-4 py-3 flex items-center justify-between">
           <button
             onClick={() => setMobileMenuOpen(true)}
             className="text-gray-700 dark:text-[#F8F9FA]"

@@ -72,7 +72,7 @@ export function OwnerAccess({ onClose, onLogin }: OwnerAccessProps) {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-md bg-white dark:bg-[#202124] rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700"
+        className="w-full max-w-md bg-white dark:bg-black rounded-2xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700"
       >
         {/* Header */}
         <div className="relative bg-[#225E56] px-6 py-8 text-white overflow-hidden">

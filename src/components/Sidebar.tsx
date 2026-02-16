@@ -115,7 +115,7 @@ export function Sidebar({ currentView, setCurrentView, user, handleLogout }: Sid
                             />
                         </div>
                         <div className="col-span-1 flex items-center justify-center">
-                            <ThemeToggle />
+                            {/* <ThemeToggle /> */}
                         </div>
                         <button
                             onClick={() => setCurrentView('settings')}

@@ -11,7 +11,7 @@ import { AuthStatus } from './AuthStatus';
 import { AccountRecovery } from './AccountRecovery';
 import { CircularErrorDetector } from './CircularErrorDetector';
 import { EmailChecker } from './EmailChecker';
-import { ThemeToggle } from './ThemeToggle';
+// import { ThemeToggle } from './ThemeToggle'; // Removed
 import { OwnerAccess } from './OwnerAccess';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -133,7 +133,7 @@ export function AuthPage({ onLogin, onBackToHome }: AuthPageProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row dark:bg-[#202124]">
+    <div className="min-h-screen flex flex-col lg:flex-row dark:bg-black">
       {/* Left Panel - Visuals & Branding */}
       <div className="lg:w-1/2 relative overflow-hidden hidden lg:flex flex-col justify-between p-12 text-white">
         {/* Background Image with Overlay */}
@@ -207,9 +207,7 @@ export function AuthPage({ onLogin, onBackToHome }: AuthPageProps) {
 
       {/* Right Panel - Auth Form */}
       <div className="lg:w-1/2 w-full flex flex-col justify-center items-center p-6 sm:p-12 relative">
-        <div className="absolute top-6 right-6 lg:right-12">
-          <ThemeToggle />
-        </div>
+        {/* Theme toggle removed */}
 
         {onBackToHome && (
           <button

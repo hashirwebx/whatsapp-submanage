@@ -1088,7 +1088,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           {/* Blog Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {/* Blog Post 1 */}
-            <article className="bg-[#FFFDF6] dark:bg-[#202124] rounded-2xl overflow-hidden border border-[#225E56]/10 hover:shadow-xl transition-all group">
+            <article className="bg-[#FFFDF6] dark:bg-black rounded-2xl overflow-hidden border border-[#225E56]/10 hover:shadow-xl transition-all group">
               <div className="relative h-56 overflow-hidden">
                 <ImageWithFallback
                   src="https://images.unsplash.com/photo-1758518731706-be5d5230e5a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMG1lZXRpbmclMjBkaXNjdXNzaW9ufGVufDF8fHx8MTc2OTg2NDEyNXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
@@ -1125,7 +1125,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </article>
 
             {/* Blog Post 2 */}
-            <article className="bg-[#FFFDF6] dark:bg-[#202124] rounded-2xl overflow-hidden border border-[#225E56]/10 hover:shadow-xl transition-all group">
+            <article className="bg-[#FFFDF6] dark:bg-black rounded-2xl overflow-hidden border border-[#225E56]/10 hover:shadow-xl transition-all group">
               <div className="relative h-56 overflow-hidden">
                 <ImageWithFallback
                   src="https://images.unsplash.com/photo-1645226880663-81561dcab0ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzbWFydHBob25lJTIwZmluYW5jZSUyMGFwcHxlbnwxfHx8fDE3Njk4NjQxMjZ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
@@ -1160,7 +1160,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </article>
 
             {/* Blog Post 3 */}
-            <article className="bg-[#FFFDF6] dark:bg-[#202124] rounded-2xl overflow-hidden border border-[#225E56]/10 hover:shadow-xl transition-all group">
+            <article className="bg-[#FFFDF6] dark:bg-black rounded-2xl overflow-hidden border border-[#225E56]/10 hover:shadow-xl transition-all group">
               <div className="relative h-56 overflow-hidden">
                 <ImageWithFallback
                   src="https://images.unsplash.com/photo-1601509876296-aba16d4c10a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxidXNpbmVzcyUyMHRlYW0lMjBjb2xsYWJvcmF0aW9ufGVufDF8fHx8MTc2OTc4MDgyOXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
@@ -1199,7 +1199,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           {/* View All Button */}
           <div className="text-center">
-            <button className="px-8 py-3 bg-white dark:bg-[#202124] text-[#225E56] border-2 border-[#225E56] rounded-xl hover:bg-[#225E56] hover:text-white transition-all">
+            <button className="px-8 py-3 bg-white dark:bg-black text-[#225E56] border-2 border-[#225E56] rounded-xl hover:bg-[#225E56] hover:text-white transition-all">
               View All Articles
             </button>
           </div>
